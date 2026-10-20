@@ -207,18 +207,6 @@ const currentRoundIndex=rounds.findIndex((r,ri)=>
   )
 );
 const visibleRoundIndex=currentRoundIndex<0?rounds.length-1:currentRoundIndex;
-  rounds.length - 1,
-  rounds.findIndex((r, ri) => {
-    return r.topics.some((t, ti) =>
-      t[1].some((q, qi) => !roomData.used?.[`${ri}-${ti}-${qi}`])
-    );
-  }) < 0 ? rounds.length - 1 :
-  rounds.findIndex((r, ri) =>
-    r.topics.some((t, ti) =>
-      t[1].some((q, qi) => !roomData.used?.[`${ri}-${ti}-${qi}`])
-    )
-  )
-);
 rounds.forEach((r,ri)=>{if(ri!==visibleRoundIndex)return;const div=document.createElement("div");div.className="round";div.style.setProperty("--accent",["#3de5c1","#328cff","#b78aff"][ri]);div.innerHTML=`<h3>${r.title}</h3>`;r.topics.forEach((t,ti)=>{const sub=document.createElement("div");sub.innerHTML=`<b>${esc(t[0])}</b>`;if(r.title)sub.style.marginBottom="4px";div.appendChild(sub);t[1].forEach((q,qi)=>{const key=`${ri}-${ti}-${qi}`;const b=document.createElement("button");b.className="topic"+(roomData.used?.[key]?" used":"");const value=ri+1;const special=specialCells.has(key)?" ✨":"";b.innerHTML=`<span>${qi+1}. ${special}</span><b>${value} очк.</b>`;b.disabled=!!roomData.used?.[key]||roomData.status!=="playing"||roomData.turnUid!==uid||players.length<2;b.onclick=()=>selectQuestion(ri,ti,qi);div.appendChild(b)})});board.appendChild(div)})}
 async function startGame(){const ps=Object.values(roomData.players||{});if(!isHost)return;if(ps.length<2){$("lobbyMsg").textContent="Нужно хотя бы 2 игрока (для вашей игры рекомендуем 7–12).";return}await update(ref(db,"rooms/"+roomId),{status:"playing",round:0,turnUid:ps[0].uid,used:{}})}
 async function selectQuestion(ri,ti,qi){if(!roomData||roomData.turnUid!==uid||roomData.status!=="playing")return;const key=`${ri}-${ti}-${qi}`;if(roomData.used?.[key])return;const q=rounds[ri].topics[ti][1][qi];const special=specialCells.has(key)?(Math.random()<.5?"kitty":"secret"):"normal";const newQ={key,ri,ti,qi,topic:rounds[ri].topics[ti][0],text:q[0],answer:q[1],options:q[2],points:ri+1,type:special,revealed:special==="normal",buzzUid:null,resolved:false};const res=await runTransaction(ref(db,"rooms/"+roomId),r=>{if(!r||r.status!=="playing"||r.turnUid!==uid||r.used?.[key])return; r.status="question";r.question=newQ;r.used={...(r.used||{}),[key]:true};return r});if(!res.committed)toast("Этот вопрос уже выбрали.");}
