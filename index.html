@@ -205,6 +205,43 @@ setInterval(()=>{if(roomData?.status==="question"&&roomData.question&&!roomData.
 function renderFinal(){const ps=Object.values(roomData.players||{}).sort((a,b)=>(b.score||0)-(a.score||0));$("finalScores").innerHTML=ps.map((p,i)=>`<div class="player">${i===0?"🏆 ":""}${i+1}. ${esc(p.name)}<div class="pts">${p.score||0} очков</div></div>`).join("")}
 async function leaveRoom(){if(!roomId)return;if(isHost){if(confirm("Закрыть комнату для всех?"))await remove(ref(db,"rooms/"+roomId))}else await remove(ref(db,`rooms/${roomId}/players/${uid}`));resetUI()}
 function resetUI(){if(unsubRoom)unsubRoom();unsubRoom=null;roomId=null;roomData=null;isHost=false;show("setup");hide("lobby");hide("game");hide("questionPanel");hide("finalPanel")}
-$("createBtn").onclick=createRoom;$("joinBtn").onclick=joinRoom;$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(roomId);toast("Код скопирован: "+roomId)}catch{toast("Код комнаты: "+roomId)}};$("startBtn").onclick=startGame;$("leaveBtn").onclick=leaveRoom;$("revealBtn").onclick=revealSpecial;$("kittyBtn").onclick=revealSpecial;$("resolveBtn").onclick=resolveAnswer;$("appealSubmit").onclick=submitAppeal;$("appealAgainst").onclick=()=>voteAppeal(false);$("appealAccept").onclick=()=>decideAppeal(true);$("appealReject").onclick=()=>decideAppeal(false);$("backBoard").onclick=nextTurn;$("newRoomBtn").onclick=()=>{resetUI();$("name").value=playerName};$("roomCode").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase());init();
+const bindClick = (id, handler) => {
+  const el = $(id);
+  if (el) el.onclick = handler;
+};
+
+bindClick("createBtn", createRoom);
+bindClick("joinBtn", joinRoom);
+bindClick("copyBtn", async () => {
+  try {
+    await navigator.clipboard.writeText(roomId);
+    toast("Код скопирован: " + roomId);
+  } catch {
+    toast("Код комнаты: " + roomId);
+  }
+});
+bindClick("startBtn", startGame);
+bindClick("leaveBtn", leaveRoom);
+bindClick("revealBtn", revealSpecial);
+bindClick("kittyBtn", revealSpecial);
+bindClick("resolveBtn", resolveAnswer);
+bindClick("appealSubmit", submitAppeal);
+bindClick("appealAgainst", () => voteAppeal(false));
+bindClick("appealAccept", () => decideAppeal(true));
+bindClick("appealReject", () => decideAppeal(false));
+bindClick("backBoard", nextTurn);
+bindClick("newRoomBtn", () => {
+  resetUI();
+  $("name").value = playerName;
+});
+
+const roomCode = $("roomCode");
+if (roomCode) {
+  roomCode.addEventListener("input", e => {
+    e.target.value = e.target.value.toUpperCase();
+  });
+}
+
+init();
 </script>
-</body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+</body></html>
