@@ -211,7 +211,11 @@ async function joinRoom() {
       return;
     }
 
-    const players = Object.values(r.players || {});
+    const players = Object.values(r.players || {});console.log("Комната:", id);
+console.log("Статус:", r.status);
+console.log("Игроки в Firebase:", r.players);
+console.log("Количество игроков:", players.length);
+console.log("Мой UID:", uid);
 
     if (players.some(p => p && p.uid === uid)) {
       roomId = id;
