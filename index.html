@@ -1,4 +1,125 @@
-const list=document.getElementById("topicList");
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Для Антона</title>
+<style>
+body{background:#091326;color:#f5e5bd;font-family:Georgia;text-align:center;margin:0}
+header{padding:20px;border-bottom:2px solid #d8b15f}
+h1,h2{color:#e7c16f}
+main{padding:20px;max-width:850px;margin:auto}
+section{display:none}
+section.active{display:block}
+button{padding:13px;margin:6px;background:#d8b15f;color:#111a2c;border:1px solid #ffe5a4;cursor:pointer;font-weight:bold}
+.card{background:#14223b;border:1px solid #d8b15f;padding:24px;margin:15px auto}
+.topics,.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.topic,.cell{padding:20px 5px;background:#1e3556;border:1px solid #d8b15f;cursor:pointer}
+.topic.selected{background:#775c2e}
+.cell{font-size:22px;color:#e7c16f}
+.cell.used{opacity:.25}
+input{width:100px;padding:8px;background:#091326;color:white}
+#question{font-size:23px;line-height:1.5}
+#answer{color:#a8e6a1;font-size:21px}
+</style>
+</head>
+<body>
+<header>
+<h1>ДЛЯ АНТОНА</h1>
+<p>Автор игры — Роман</p>
+</header>
+<main>
+<section id="home" class="active">
+<div class="card">
+<div style="font-size:80px">⚽</div>
+<h2>Роман представляет</h2>
+<h1>Для Антона</h1>
+<p>Футбольная викторина</p>
+<button onclick="go('topics')">НАЧАТЬ ИГРУ</button>
+</div>
+</section>
+
+<section id="topics">
+<h2>Темы игры</h2>
+<div class="topics" id="topicList"></div>
+<button onclick="start()">ИГРАТЬ</button>
+</section>
+
+<section id="game">
+<h2 id="title"></h2>
+<p>
+<input id="n1" value="Антон">
+Очки: <b id="s1">0</b>
+<button onclick="score(1,100)">+100</button>
+</p>
+<p>
+<input id="n2" value="Роман">
+Очки: <b id="s2">0</b>
+<button onclick="score(2,100)">+100</button>
+</p>
+<div class="board" id="board"></div>
+<button onclick="go('topics')">СМЕНИТЬ ТЕМУ</button>
+</section>
+
+<section id="qa">
+<div class="card">
+<h2 id="cat"></h2>
+<p id="points"></p>
+<div id="question"></div>
+<p id="answer" hidden></p>
+<button onclick="document.getElementById('answer').hidden=false">ПОКАЗАТЬ ОТВЕТ</button>
+<p>Кто ответил правильно?</p>
+<button onclick="award(1)">АНТОН</button>
+<button onclick="award(2)">РОМАН</button>
+<button onclick="go('game')">ПАС</button>
+</div>
+</section>
+</main>
+
+<script>
+const data={
+"АПЛ":[
+["Кто лучший бомбардир в истории АПЛ?","Алан Ширер."],
+["Какой клуб играет на «Энфилде»?","«Ливерпуль»."],
+["Как называют стадион «Манчестер Юнайтед»?","«Олд Траффорд»."],
+["Какой клуб называют «канонирами»?","«Арсенал»."]
+],
+"Ла Лига":[
+["Из какого города «Барселона»?","Из Барселоны."],
+["Как называется дерби «Реала» и «Барселоны»?","Эль-Класико."],
+["Как зовут знаменитого аргентинца, игравшего за «Барселону»?","Лионель Месси."],
+["Как называется домашний стадион «Реала»?","«Сантьяго Бернабеу»."]
+],
+"Серия A":[
+["Из какой страны «Ювентус»?","Из Италии."],
+["В каком городе играют «Милан» и «Интер»?","В Милане."],
+["Как называют «Ювентус»?","«Старая синьора»."],
+["Как называется стадион «Милана» и «Интера»?","«Сан-Сиро»."]
+],
+"РПЛ":[
+["Из какого города «Зенит»?","Из Санкт-Петербурга."],
+["Какой клуб играет на «Открытие Банк Арене»?","«Спартак» Москва."],
+["Как называется домашний стадион ЦСКА?","«ВЭБ Арена»."],
+["Из какого города «Краснодар»?","Из Краснодара."]
+],
+"Сборные":[
+["Сколько игроков одной команды на поле?","11."],
+["Кто выиграл чемпионат мира 2022 года?","Аргентина."],
+["Кто выиграл чемпионат мира 2018 года?","Франция."],
+["Какая сборная чаще выигрывала чемпионат мира?","Бразилия."]
+],
+"Футбольные правила":[
+["Сколько минут длится основное время матча?","90 минут."],
+["С какой отметки бьют пенальти?","С 11-метровой отметки."],
+["Что такое хет-трик?","Три гола одного игрока за матч."],
+["Как называется удар с углового?","Угловой удар."]
+]};
+let selected="АПЛ",current=null,used=new Set(),scores=[0,0];
+function go(id){
+document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+  const list=document.getElementById("topicList");
 Object.keys(data).forEach(t=>{
 let b=document.createElement("div");b.className="topic";b.textContent=t;
 b.onclick=()=>{selected=t;document.querySelectorAll(".topic").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};
