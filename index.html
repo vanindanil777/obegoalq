@@ -178,7 +178,36 @@ function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidd
 function show(id){$(id).classList.remove("hidden")}function hide(id){$(id).classList.add("hidden")}
 function code(){return Math.random().toString(36).slice(2,7).toUpperCase()}
 function configReady(){return !firebaseConfig.apiKey.startsWith("PASTE_")&&!firebaseConfig.projectId.startsWith("PASTE_")}
-async function init(){if(!configReady()){ $("connection").textContent="Нужна настройка Firebase";$("setupError").textContent="Сначала настрой Firebase по инструкции README.md и замени firebaseConfig в index.html."; $("createBtn").disabled=true;$("joinBtn").disabled=true;return}
+async function init() {
+  if (!configReady()) {
+    $("connection").textContent = "Нужна настройка Firebase";
+    $("setupError").textContent =
+      "Проверь firebaseConfig в index.html.";
+    $("createBtn").disabled = true;
+    $("joinBtn").disabled = true;
+    return;
+  }
+
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getDatabase(app);
+
+    const result = await signInAnonymously(auth);
+    uid = result.user.uid;
+
+    $("connection").textContent = "Подключено к Firebase";
+    $("setupError").textContent = "";
+
+    console.log("Firebase Auth UID:", uid);
+    console.log("Firebase Auth:", auth.currentUser ? "авторизован" : "не авторизован");
+  } catch (e) {
+    console.error("Ошибка Firebase:", e);
+    $("connection").textContent = "Ошибка подключения";
+    $("setupError").textContent =
+      "Ошибка Firebase: " + e.code + " — " + e.message;
+  }
+}
 try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getDatabase(app);await signInAnonymously(auth);onAuthStateChanged(auth,u=>{if(u){uid=u.uid;$("connection").textContent="Подключено к интернету"}})}catch(e){$("setupError").textContent="Ошибка Firebase: "+e.message}}
 async function createRoom(){if(!uid)return;playerName=$("name").value.trim()||"Игрок";let id=code();while((await get(ref(db,"rooms/"+id))).exists())id=code();roomId=id;isHost=true;const player={uid,name:playerName,score:0,joinedAt:Date.now(),host:true};const room={code:id,host:uid,status:"lobby",createdAt:serverTimestamp(),players:{[uid]:player},turnUid:uid,used:{},question:null,round:0,topic:null};await set(ref(db,"rooms/"+id),room);subscribeRoom();showRoom();toast("Комната создана!")}
 async function joinRoom() {
