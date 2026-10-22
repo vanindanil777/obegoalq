@@ -1,165 +1,210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Для Антона</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Для Антона — футбольная викторина</title>
 <style>
-body{background:#091326;color:#f5e5bd;font-family:Georgia;text-align:center;margin:0}
-header{padding:20px;border-bottom:2px solid #d8b15f}
-h1,h2{color:#e7c16f}
-main{padding:20px;max-width:850px;margin:auto}
-section{display:none}
-section.active{display:block}
-button{padding:13px;margin:6px;background:#d8b15f;color:#111a2c;border:1px solid #ffe5a4;cursor:pointer;font-weight:bold}
-.card{background:#14223b;border:1px solid #d8b15f;padding:24px;margin:15px auto}
-.topics,.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.topic,.cell{padding:20px 5px;background:#1e3556;border:1px solid #d8b15f;cursor:pointer}
-.topic.selected{background:#775c2e}
-.cell{font-size:22px;color:#e7c16f}
-.cell.used{opacity:.25}
-input{width:100px;padding:8px;background:#091326;color:white}
-#question{font-size:23px;line-height:1.5}
-#answer{color:#a8e6a1;font-size:21px}
+:root{--bg:#050914;--panel:#101522;--line:#78602f;--cyan:#d7b15d;--gold:#f3cc72;--purple:#b78aff;--muted:#b8b5aa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#59421d 0%,transparent 48%),radial-gradient(ellipse at top,#182032,transparent 62%),var(--bg);color:#f5f8ff;font:16px/1.45 system-ui,sans-serif}header{padding:20px clamp(14px,4vw,40px);display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #6d572a;background:#070a13ed}h1{font-size:clamp(22px,4vw,34px);margin:0}.muted{color:var(--muted)}main{max-width:1180px;margin:auto;padding:22px 14px 50px}.panel{background:linear-gradient(145deg,#151a27f5,#090d17f5);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px;box-shadow:0 12px 35px #0007}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px}input,select{width:100%;background:#071426;color:#fff;border:1px solid #355675;border-radius:10px;padding:12px;font:inherit}button{border:1px solid #a8863d;background:linear-gradient(135deg,#5c4823,#211a10);color:#fff;border-radius:11px;padding:11px 15px;font:inherit;cursor:pointer;transition:.18s}button:hover{transform:translateY(-1px);filter:brightness(1.2)}button:disabled{opacity:.4;cursor:not-allowed;transform:none}.primary{background:linear-gradient(135deg,#e8c56c,#956a24);border-color:#f3cc72;color:#171108}.gold{background:linear-gradient(135deg,#e5ae29,#8d5a08);border-color:var(--gold);color:#170f00;font-weight:800}.danger{background:#492033;border-color:#8b4261}.hidden{display:none!important}.status{padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px}.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.round{border:1px solid var(--accent);border-radius:15px;padding:12px;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 10%,#101e35),#0b172a)}.round h3{margin:0 0 8px}.topic{width:100%;text-align:left;margin:4px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}.topic.used{opacity:.35;filter:grayscale(1)}.topic b{color:var(--gold)}.players{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}.player{padding:10px;border:1px solid #2c4b6b;background:#0a1729;border-radius:11px}.player.me{border-color:var(--cyan);box-shadow:0 0 15px #3de5c122}.player .pts{color:var(--gold);font-weight:800}.notice{padding:12px;border-radius:10px;background:#122944;border:1px solid #315b80}.question{font-size:clamp(20px,3vw,28px);font-weight:800;margin:16px 0}.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.answer{min-height:52px;text-align:left}.answer.good{background:#075a40;border-color:#35e7a4}.answer.bad{background:#6a1e32;border-color:#ff6683}.special{border-color:var(--purple);background:linear-gradient(135deg,#351454,#12213a)}.secret{border-color:var(--gold);background:linear-gradient(135deg,#4b350b,#12213a)}footer{text-align:center;color:#6f8cac;font-size:12px;padding:0 12px 28px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 18px;background:#112b42;border:1px solid var(--cyan);border-radius:12px;z-index:20;box-shadow:0 8px 35px #0008;max-width:90vw}.bigcode{font-size:30px;letter-spacing:.16em;color:var(--gold);font-weight:900}.timer{font-size:36px;text-align:center;color:var(--gold);font-weight:900}.tag{font-size:12px;border:1px solid #385c7d;padding:5px 8px;border-radius:999px;color:var(--muted)}@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.panel,.round{animation:riseIn .35sease-out}h1{letter-spacing:.04em;text-shadow:0 0 22px #d7b15d35}.question{color:#f3cc72;text-shadow:0 2px 18px #f3cc7220}.player{border-color:#5d4b2b;background:#0c1019}.player.me{border-color:var(--gold);box-shadow:0 0 15px #f3cc7222}@media(max-width:780px){.board{grid-template-columns:1fr}.answers{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header>
-<h1>ДЛЯ АНТОНА</h1>
-<p>Автор игры — Роман</p>
-</header>
+<header><div><h1>⚽ Для Антона</h1><div class="muted">Футбольная викторина · автор Роман · онлайн-комнаты</div></div><div class="row"><span class="status" id="connection">Не подключено</span><span class="status">до 12 игроков</span></div></header>
 <main>
-<section id="home" class="active">
-<div class="card">
-<div style="font-size:80px">⚽</div>
-<h2>Роман представляет</h2>
-<h1>Для Антона</h1>
-<p>Футбольная викторина</p>
-<button onclick="go('topics')">НАЧАТЬ ИГРУ</button>
-</div>
+<section class="panel" id="setup">
+<h2>Войти в игру</h2><p class="muted">Создай комнату или введи код от друга. Вопросы открываются по порядку.</p>
+<div class="grid"><label class="field">Твоё имя<input id="name" maxlength="20" placeholder="Например, Артём"></label><label class="field">Код комнаты<input id="roomCode" maxlength="6" placeholder="Например, A7K2Q" style="text-transform:uppercase"></label></div>
+<div class="row" style="margin-top:12px"><button class="primary" id="createBtn">Создать комнату</button><button id="joinBtn">Войти по коду</button></div>
+<div id="setupError" class="muted" style="margin-top:10px"></div>
 </section>
-
-<section id="topics">
-<h2>Темы игры</h2>
-<div class="topics" id="topicList"></div>
-<button onclick="start()">ИГРАТЬ</button>
+<section class="panel hidden" id="lobby">
+<div class="row" style="justify-content:space-between"><div><h2>Комната <span class="bigcode" id="roomLabel"></span></h2><div class="muted" id="lobbyStatus">Ожидаем игроков…</div></div><button id="copyBtn">Скопировать код</button></div>
+<p class="muted">Отправь код друзьям. Максимум 12 игроков. Ведущего нет: вопросы, таймер и подсчёт очков автоматические.</p>
+<div id="lobbyPlayers" class="players"></div>
+<div class="row" style="margin-top:14px"><button class="primary" id="startBtn">Начать игру</button><button class="danger" id="leaveBtn">Выйти из комнаты</button></div>
+<div id="lobbyMsg" class="muted" style="margin-top:10px"></div>
 </section>
-
-<section id="game">
-<h2 id="title"></h2>
-<p>
-<input id="n1" value="Антон">
-Очки: <b id="s1">0</b>
-<button onclick="score(1,100)">+100</button>
-</p>
-<p>
-<input id="n2" value="Роман">
-Очки: <b id="s2">0</b>
-<button onclick="score(2,100)">+100</button>
-</p>
+<section class="panel hidden" id="game">
+<div class="row" style="justify-content:space-between"><div><h2 id="gameTitle">Игровое поле</h2><div class="muted" id="turnLabel"></div></div><div class="row"><span class="status">Комната <b id="gameRoom"></b></span><span class="status">Счёт: <b id="myScore">0</b></span></div></div>
+<div id="gameNotice" class="notice" style="margin:12px 0"></div>
 <div class="board" id="board"></div>
-<button onclick="go('topics')">СМЕНИТЬ ТЕМУ</button>
 </section>
-
-<section id="qa">
-<div class="card">
-<h2 id="cat"></h2>
-<p id="points"></p>
-<div id="question"></div>
-<p id="answer" hidden></p>
-<button onclick="document.getElementById('answer').hidden=false">ПОКАЗАТЬ ОТВЕТ</button>
-<p>Кто ответил правильно?</p>
-<button onclick="award(1)">АНТОН</button>
-<button onclick="award(2)">РОМАН</button>
-<button onclick="go('game')">ПАС</button>
+<section class="panel hidden" id="questionPanel">
+<div class="row"><span class="tag" id="qRound"></span><span class="tag" id="qTopic"></span><span class="tag" id="qValue"></span><span class="tag" id="qSpecial"></span></div>
+<h2 class="question" id="qText"></h2>
+<div id="secretBox" class="hidden"><div class="timer" id="timer">3</div><div style="text-align:center"><button class="gold" id="revealBtn">Раскрыть секрет</button></div></div>
+<div id="kittyBox" class="hidden"><div class="timer">🎒 🐈 ❓</div><p class="muted" style="text-align:center">В мешке спрятан вопрос — нажми, чтобы открыть.</p><div style="text-align:center"><button class="primary" id="kittyBtn">Открыть мешок</button></div></div>
+<div id="answerBox"><div class="answers" id="answerButtons"></div></div>
+<div class="notice" id="buzzNotice" style="margin-top:12px">Ждём первый ответ…</div>
+<div class="panel" id="appealPanel" style="margin-top:12px;padding:14px">
+  <h3 style="margin-top:0">⚖️ Апелляция</h3>
+  <div id="appealStatus" class="muted">После оценки ответа можно проголосовать за пересмотр.</div>
+  <div id="appealForm" class="row" style="margin-top:10px"><button id="appealSubmit" class="gold">Я ПРАВ</button><button id="appealAgainst" class="danger">Я ПРОТИВ</button></div><div id="appealHostControls" class="hidden row" style="margin-top:10px"></div>
 </div>
-</section>
-</main>
+<div class="row" style="justify-content:space-between;margin-top:14px"><button id="backBoard">К игровому полю</button><button class="primary hidden" id="resolveBtn">Засчитать ответ и продолжить</button></div>
+</section><section class="panel hidden" id="finalPanel"><h2>🏆 Игра окончена</h2><div id="finalScores" class="players"></div><button class="primary" id="newRoomBtn" style="margin-top:12px">Создать новую комнату</button></section>
+</main><footer>Для Антона · футбольная викторина · автор Роман</footer>
+<div id="toast" class="toast hidden"></div>
+<script type="module">import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, get, update, onValue, runTransaction, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-<script>
-const data={
-"АПЛ":[
-["Кто лучший бомбардир в истории АПЛ?","Алан Ширер."],
-["Какой клуб играет на «Энфилде»?","«Ливерпуль»."],
-["Как называют стадион «Манчестер Юнайтед»?","«Олд Траффорд»."],
-["Какой клуб называют «канонирами»?","«Арсенал»."]
-],
-"Ла Лига":[
-["Из какого города «Барселона»?","Из Барселоны."],
-["Как называется дерби «Реала» и «Барселоны»?","Эль-Класико."],
-["Как зовут знаменитого аргентинца, игравшего за «Барселону»?","Лионель Месси."],
-["Как называется домашний стадион «Реала»?","«Сантьяго Бернабеу»."]
-],
-"Серия A":[
-["Из какой страны «Ювентус»?","Из Италии."],
-["В каком городе играют «Милан» и «Интер»?","В Милане."],
-["Как называют «Ювентус»?","«Старая синьора»."],
-["Как называется стадион «Милана» и «Интера»?","«Сан-Сиро»."]
-],
-"РПЛ":[
-["Из какого города «Зенит»?","Из Санкт-Петербурга."],
-["Какой клуб играет на «Открытие Банк Арене»?","«Спартак» Москва."],
-["Как называется домашний стадион ЦСКА?","«ВЭБ Арена»."],
-["Из какого города «Краснодар»?","Из Краснодара."]
-],
-"Сборные":[
-["Сколько игроков одной команды на поле?","11."],
-["Кто выиграл чемпионат мира 2022 года?","Аргентина."],
-["Кто выиграл чемпионат мира 2018 года?","Франция."],
-["Какая сборная чаще выигрывала чемпионат мира?","Бразилия."]
-],
-"Футбольные правила":[
-["Сколько минут длится основное время матча?","90 минут."],
-["С какой отметки бьют пенальти?","С 11-метровой отметки."],
-["Что такое хет-трик?","Три гола одного игрока за матч."],
-["Как называется удар с углового?","Угловой удар."]
-]};
-let selected="АПЛ",current=null,used=new Set(),scores=[0,0];
-function go(id){
-document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
-  const list=document.getElementById("topicList");
-Object.keys(data).forEach(t=>{
-let b=document.createElement("div");b.className="topic";b.textContent=t;
-b.onclick=()=>{selected=t;document.querySelectorAll(".topic").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};
-if(t===selected)b.classList.add("selected");
-list.appendChild(b);
-});
-function start(){
-used.clear();document.getElementById("title").textContent="Тема раунда: "+selected;
-let board=document.getElementById("board");board.innerHTML="";
-for(let i=0;i<4;i++){
-let c=document.createElement("div");c.className="cell";c.textContent=selected;
-c.style.fontSize="14px";c.style.cursor="default";board.appendChild(c);
-}
-for(let i=0;i<4;i++){
-let c=document.createElement("div");c.className="cell";c.textContent=(i+1)*100;
-c.onclick=()=>ask(i,c);board.appendChild(c);
-}
-for(let i=0;i<4;i++){
-let c=document.createElement("div");c.className="cell";c.textContent=(i+1)*100;
-c.onclick=()=>ask(i,c);board.appendChild(c);
-}
-go("game");
-}
-function ask(i,cell){
-if(cell.classList.contains("used"))return;
-cell.classList.add("used");current={i,cell,points:(i+1)*100};
-document.getElementById("cat").textContent=selected;
-document.getElementById("points").textContent=current.points+" очков";
-document.getElementById("question").textContent=data[selected][i][0];
-document.getElementById("answer").textContent="Ответ: "+data[selected][i][1];
-document.getElementById("answer").hidden=true;go("qa");
-}
-function score(player,n){
-scores[player-1]+=n;
-document.getElementById("s"+player).textContent=scores[player-1];
-}
-function award(player){
-if(player)score(player,current.points);
-go("game");
-}
+// 1) Создай проект Firebase и вставь сюда конфигурацию из настроек приложения.
+const firebaseConfig = {
+  apiKey: "AIzaSyCLtBd2EO5_tLd0TA_vNCfA5DFueS3jb9s",
+  authDomain: "obegoal-eb039.firebaseapp.com",
+  databaseURL: "https://obegoal-eb039-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "obegoal-eb039",
+  appId: "1:524657843322:web:9feda3c300bec1c201afc3"
+};
+
+const $ = id => document.getElementById(id);
+const rounds = [
+{title:"Раунд 1 · 1 очко",topics:[
+["Чемпионаты мира",[
+["Кто забил победный гол в финале ЧМ-2010?","Андрес Иньеста",["Андрес Иньеста","Давид Вилья","Хави","Фернандо Торрес"]],
+["Какая сборная выиграла ЧМ-1998?","Франция",["Бразилия","Франция","Италия","Германия"]],
+["Кто выиграл «Золотой мяч» ЧМ-2014?","Лионель Месси",["Томас Мюллер","Хамес Родригес","Лионель Месси","Мануэль Нойер"]],
+["Какая сборная стала чемпионом мира в 2006 году?","Италия",["Франция","Италия","Бразилия","Германия"]],
+["Кто забил самый быстрый гол в истории ЧМ среди мужчин?","Хакан Шюкюр",["Мирослав Клозе","Роналдо","Хакан Шюкюр","Клинт Демпси"]]]],
+["Лига чемпионов",[
+["Кто выиграл Лигу чемпионов в сезоне 2003/04?","Порту",["Монако","Порту","Милан","Челси"]],
+["Какой клуб победил в финале ЛЧ 2012 года?","Челси",["Бавария","Челси","Реал Мадрид","Барселона"]],
+["Кто забил гол ударом с лёта в финале ЛЧ 2002 года?","Зинедин Зидан",["Рауль","Зинедин Зидан","Роберто Карлос","Стив Макманаман"]],
+["Кто выиграл финал ЛЧ 1997 года?","Боруссия Дортмунд",["Ювентус","Аякс","Боруссия Дортмунд","Манчестер Юнайтед"]],
+["Какой клуб выиграл первый Кубок европейских чемпионов?","Реал Мадрид",["Бенфика","Реал Мадрид","Милан","Реймс"]]]],
+["Золотой мяч",[
+["Кто первым из африканских футболистов выиграл «Золотой мяч»?","Джордж Веа",["Дидье Дрогба","Джордж Веа","Самюэль Это’о","Яя Туре"]],
+["Кто получил награду в 2004 году?","Андрей Шевченко",["Роналдиньо","Деку","Андрей Шевченко","Тьерри Анри"]],
+["Кто выиграл «Золотой мяч» в 2006 году?","Фабио Каннаваро",["Джанлуиджи Буффон","Фабио Каннаваро","Зинедин Зидан","Роналдиньо"]],
+["Кто выиграл награду в 1998 году?","Зинедин Зидан",["Роналдо","Зинедин Зидан","Давор Шукер","Михаэль Баллак"]],
+["Кто выиграл «Золотой мяч» в 2001 году?","Майкл Оуэн",["Рауль","Луиш Фигу","Майкл Оуэн","Оливер Кан"]]]],
+["Английский футбол",[
+["Кто тренировал «Лестер» в сезоне АПЛ 2015/16?","Клаудио Раньери",["Найджел Пирсон","Клаудио Раньери","Брендан Роджерс","Жозе Моуринью"]],
+["Какой клуб завершил сезон АПЛ 2003/04 без поражений?","Арсенал",["Челси","Арсенал","Ливерпуль","Манчестер Юнайтед"]],
+["Кто забил победный гол «Манчестер Юнайтед» в финале ЛЧ 1999 года?","Оле-Гуннар Сульшер",["Дэвид Бекхэм","Тедди Шерингем","Оле-Гуннар Сульшер","Райан Гиггз"]],
+["Какой клуб выиграл АПЛ в сезоне 2015/16?","Лестер Сити",["Тоттенхэм","Лестер Сити","Арсенал","Манчестер Сити"]],
+["Как называется стадион «Ливерпуля»?","Энфилд",["Стэмфорд Бридж","Энфилд","Олд Траффорд","Этихад"]]]],
+["Итальянский футбол",[
+["Кто тренировал «Интер» при требле 2009/10?","Жозе Моуринью",["Карло Анчелотти","Жозе Моуринью","Рафаэль Бенитес","Антонио Конте"]],
+["Кто выиграл Серию А в сезоне 2022/23?","Наполи",["Ювентус","Наполи","Интер","Милан"]],
+["Какой клуб называют «нерадзурри»?","Интер",["Рома","Лацио","Интер","Милан"]],
+["Какой клуб выиграл ЛЧ в 2007 году?","Милан",["Ливерпуль","Милан","Челси","Барселона"]],
+["Кого Италия победила в финале ЧМ-2006?","Францию по пенальти",["Германию 2:0","Францию по пенальти","Бразилию 1:0","Португалию 3:1"]]]],
+["Испанский футбол",[["Кто тренировал «Барселону» в сезоне требла 2008/09?","Пеп Гвардиола",["Франк Райкард","Пеп Гвардиола","Луис Энрике","Йохан Кройф"]],
+["Какой клуб выбил «Барселону» в полуфинале ЛЧ 2019 года?","Ливерпуль",["Тоттенхэм","Ливерпуль","Аякс","Рома"]],
+["Кто тренировал «Атлетико» при победе в Ла Лиге 2013/14?","Диего Симеоне",["Кике Флорес","Диего Симеоне","Рафаэль Бенитес","Луис Арагонес"]],
+["Какой клуб выиграл Ла Лигу 1999/2000?","Депортиво Ла-Корунья",["Валенсия","Реал Мадрид","Депортиво Ла-Корунья","Барселона"]],["Как называется дерби «Реала» и «Барселоны»?","Эль-Класико",["Эль-Класико","Дерби Мадриленьо","Севильское дерби","Класико Баско"]]]]
+]},
+{title:"Раунд 2 · 2 очка",topics:[
+["Тактика",[
+["Что означает термин «инвертированный фулбек»?","Крайний защитник смещается в центр при владении",["Защитник играет форварда","Крайний защитник смещается в центр при владении","Вратарь выходит к центру","Нападающий уходит на фланг"]],
+["Как называется схема 3-4-2-1?","Три защитника, четыре полузащитника, два атакующих полузащитника и форвард",["Три защитника, четыре полузащитника, два атакующих полузащитника и форвард","Три форварда и семь защитников","Четыре защитника и два форварда","Десять полевых игроков без форварда"]],
+["Что такое «ложная девятка»?","Нападающий, опускающийся в глубину",["Крайний защитник","Нападающий, опускающийся в глубину","Опорный полузащитник","Вратарь-либеро"]],
+["Что такое контрпрессинг?","Попытка вернуть мяч сразу после потери",["Низкий блок у штрафной","Попытка вернуть мяч сразу после потери","Длинная передача вперёд","Персональная опека вратаря"]],
+["Как называется пространство между линиями соперника?","Карман / пространство между линиями",["Коридор VAR","Карман / пространство между линиями","Вторая штанга","Полукруг штрафной"]]]],
+["Рекорды ЧМ",[
+["Сколько голов забил Мирослав Клозе на чемпионатах мира?","16",["14","15","16","17"]],
+["Кто забил пять голов в одном матче ЧМ-1994?","Олег Саленко",["Ромарио","Олег Саленко","Роберто Баджо","Христо Стоичков"]],
+["Кто стал лучшим бомбардиром ЧМ-2014?","Хамес Родригес",["Лионель Месси","Томас Мюллер","Хамес Родригес","Неймар"]],
+["Какая сборная заняла третье место на ЧМ-2002?","Турция",["Южная Корея","Турция","Германия","Испания"]],
+["Кто забил победный гол в финале ЧМ-1954?","Хельмут Ран",["Фриц Вальтер","Хельмут Ран","Ференц Пушкаш","Шандор Кочиш"]]]],
+["Кубок чемпионов",[
+["Кто выиграл Кубок европейских чемпионов в сезоне 1982/83?","Гамбург",["Ювентус","Гамбург","Ливерпуль","Бавария"]],
+["Кто победил «Барселону» в финале 1986 года по пенальти?","Стяуа",["Стяуа","Порту","Милан","Аякс"]],
+["Кто выиграл турнир в 1991 году?","Црвена Звезда",["Марсель","Црвена Звезда","Бенфика","Милан"]],
+["Кто победил «Баварию» в финале 1987 года?","Порту",["Порту","Реал Мадрид","ПСВ","Ливерпуль"]],
+["Кто выиграл Кубок чемпионов в 1978/79?","Ноттингем Форест",["Ливерпуль","Аякс","Ноттингем Форест","Боруссия Мёнхенгладбах"]]]],
+["Матчи",[
+["Какой счёт был у «Ливерпуля» против «Барселоны» в полуфинале ЛЧ 2019?","4:0",["3:0","4:0","4:1","5:1"]],
+["Какой счёт был в матче Уругвай — Бразилия на ЧМ-1950?","2:1",["1:0","2:1","3:2","1:1"]],
+["Какой счёт был в финале ЛЧ 2017 года?","Реал Мадрид 4:1 Ювентус",["Реал 3:1 Ювентус","Реал 4:1 Ювентус","Ювентус 2:1 Реал","1:1, победа Реала по пенальти"]],
+["Какой счёт был у Германии против Бразилии в полуфинале ЧМ-2014?","7:1",["6:0","7:1","5:1","7:2"]],
+["Кто выиграл финал ЛЧ 2005 года?","Ливерпуль",["Милан","Ливерпуль","Челси","Порту"]]]],
+["Трансферы",[
+["Куда Луиш Фигу перешёл из «Барселоны» в 2000 году?","Реал Мадрид",["Милан","Реал Мадрид","Интер","Манчестер Юнайтед"]],
+["Какой клуб купил Зидана у «Ювентуса» в 2001 году?","Реал Мадрид",["Реал Мадрид","Арсенал","Бавария","Челси"]],
+["Из какого клуба «Арсенал» подписал Тьерри Анри в 1999 году?","Ювентус",["Монако","Ювентус","Барселона","Лион"]],
+["Откуда Роналду перешёл в «Реал» в 2009 году?","Манчестер Юнайтед",["Спортинг","Манчестер Юнайтед","Интер","Порту"]],
+["Куда Неймар перешёл из «Барселоны» в 2017 году?","Пари Сен-Жермен",["Манчестер Сити","Пари Сен-Жермен","Челси","Ювентус"]]]],
+["Вратари",[
+["Кто единственный вратарь, выигравший «Золотой мяч»?","Лев Яшин",["Дино Дзофф","Лев Яшин","Оливер Кан","Джанлуиджи Буффон"]],
+["Кто был вратарём Испании на ЧМ-2010?","Икер Касильяс",["Пепе Рейна","Икер Касильяс","Виктор Вальдес","Давид де Хеа"]],
+["Кто был вратарём «Манчестер Юнайтед» в финале ЛЧ 1999?","Петер Шмейхель",["Эдвин ван дер Сар","Петер Шмейхель","Фабьен Бартез","Раймонд ван дер Гау"]],["Кто был капитаном Италии на ЧМ-2006?","Фабио Каннаваро",["Франческо Тотти","Джанлуиджи Буффон","Фабио Каннаваро","Андреа Пирло"]],
+["Какой вратарь выиграл ЧМ-2014 с Германией?","Мануэль Нойер",["Мануэль Нойер","Тибо Куртуа","Джанлуиджи Буффон","Икер Касильяс"]]]]
+]},
+{title:"Раунд 3 · 3 очка",topics:[
+["Редкие факты",[
+["Какая сборная стала бронзовым призёром ЧМ-1998?","Хорватия",["Нидерланды","Хорватия","Англия","Италия"]],
+["Кто выиграл ЧМ-1974?","ФРГ",["Нидерланды","ФРГ","Бразилия","Польша"]],
+["Какая сборная выбила Францию на групповом этапе ЧМ-2002?","Сенегал",["Дания","Сенегал","Уругвай","Турция"]],
+["Кто был лучшим бомбардиром ЧМ-1998?","Давор Шукер",["Роналдо","Давор Шукер","Зинедин Зидан","Бебето"]],
+["Какая сборная выиграла бронзу ЧМ-2002?","Турция",["Южная Корея","Турция","Испания","США"]]]],
+["Тактика",[
+["Какого тренера связывают с «катеначчо» «Интера» 1960-х?","Эленио Эррера",["Арриго Сакки","Эленио Эррера","Витторио Поццо","Марчелло Липпи"]],
+["Как называют футбол тотального движения сборной Нидерландов 1970-х?","Тотальный футбол",["Катеначчо","Тотальный футбол","Тики-така","Гегенпрессинг"]],
+["Что такое «перегрузка с переводом»?","Собрать игроков на одной стороне и перевести мяч на другую",["Держать всех в штрафной","Собрать игроков на одной стороне и перевести мяч на другую","Постоянно бить верхом","Опекать одного соперника"]],
+["Как называют атакующего полузащитника за форвардом?","Десятка",["Шестёрка","Десятка","Латераль","Либеро"]],
+["Что означает высокий блок?","Оборона и давление располагаются высоко на поле",["Все стоят у своей штрафной","Оборона и давление располагаются высоко на поле","Только длинные передачи","Защитники не атакуют"]]]],
+["Финалы",[
+["Кто проиграл «Манчестер Юнайтед» в финале ЛЧ 1999 года?","Бавария",["Бавария","Ювентус","Валенсия","Бенфика"]],["Какой клуб выиграл Кубок УЕФА 2003 года?","Порту",["Селтик","Порту","Ливерпуль","Лацио"]],
+["Кто выиграл Кубок УЕФА 2001 года?","Ливерпуль",["Алавес","Ливерпуль","Рома","Боруссия Дортмунд"]],
+["Кто победил «Марсель» в финале Кубка чемпионов 1991 года?","Црвена Звезда",["Милан","Црвена Звезда","Барселона","Сампдория"]],
+["Какой клуб выиграл Кубок обладателей кубков 1986 года?","Динамо Киев",["Динамо Киев","Атлетико Мадрид","Аякс","Монако"]]]],
+["Индивидуальные награды",[
+["Кто выиграл «Золотой мяч» в 2001 году?","Майкл Оуэн",["Рауль","Майкл Оуэн","Оливер Кан","Дэвид Бекхэм"]],
+["Кто стал лучшим бомбардиром Евро-2000 вместе с Саво Милошевичем?","Патрик Клюйверт",["Тьерри Анри","Патрик Клюйверт","Златан Ибрагимович","Франческо Тотти"]],
+["Кто стал лучшим бомбардиром ЧМ-2006?","Мирослав Клозе",["Лука Тони","Мирослав Клозе","Роналдо","Тьерри Анри"]],
+["Кто получил «Золотой мяч» в 1995 году?","Джордж Веа",["Юрген Клинсманн","Джордж Веа","Паоло Мальдини","Ромарио"]],
+["Кто выиграл «Золотой мяч» в 1994 году?","Христо Стоичков",["Роберто Баджо","Христо Стоичков","Ромарио","Паоло Мальдини"]]]],
+["Клубная история",[
+["Какой клуб первым выиграл три Кубка чемпионов подряд в 1970-х?","Аякс",["Бавария","Аякс","Ливерпуль","Милан"]],
+["Кто выиграл Кубок УЕФА 2000/01?","Ливерпуль",["Валенсия","Ливерпуль","Рома","Порту"]],
+["Какой клуб выиграл Кубок чемпионов в 1977 году?","Ливерпуль",["Боруссия Мёнхенгладбах","Ливерпуль","Аякс","Бавария"]],
+["Кто выиграл Кубок УЕФА в 1988 году?","Байер Леверкузен",["Эспаньол","Байер Леверкузен","Наполи","Реал Мадрид"]],
+["Какой клуб выиграл Кубок УЕФА 1989 года?","Наполи",["Наполи","Штутгарт","Ювентус","Бордо"]]]],
+["Правила",[
+["В каком году VAR впервые применили на мужском ЧМ?","2018",["2014","2016","2018","2022"]],
+["Можно ли находиться в офсайде непосредственно при вбрасывании?","Нет",["Да","Нет","Только в своей половине","После касания защитника"]],
+["Что получает игрок за вторую жёлтую карточку?","Красную карточку и удаление",["Штрафной удар","Красную карточку и удаление","Предупреждение капитану","Пенальти"]],
+["Можно ли забить непосредственно с начального удара в ворота соперника?","Да",["Нет","Да","Только в дополнительное время","Только после рикошета"]],
+["Как называется запрет вратарю брать руками намеренный пас ногой партнёра?","Правило обратного паса",["Правило преимущества","Правило обратного паса","Правило шести секунд","Правило офсайда"]]]]
+]}
+];
+
+let app,auth,db,uid=null,roomId=null,playerName="",isHost=false,roomData=null,unsubRoom=null,currentQuestion=null;
+const specialCells=new Set(["0-1-2","0-4-4","1-0-3","1-4-1","2-2-4","2-5-2"]);
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+function show(id){$(id).classList.remove("hidden")}function hide(id){$(id).classList.add("hidden")}
+function code(){return Math.random().toString(36).slice(2,7).toUpperCase()}
+function configReady(){return !firebaseConfig.apiKey.startsWith("PASTE_")&&!firebaseConfig.projectId.startsWith("PASTE_")}
+async function init(){if(!configReady()){ $("connection").textContent="Нужна настройка Firebase";$("setupError").textContent="Сначала настрой Firebase по инструкции README.md и замени firebaseConfig в index.html."; $("createBtn").disabled=true;$("joinBtn").disabled=true;return}
+try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getDatabase(app);await signInAnonymously(auth);onAuthStateChanged(auth,u=>{if(u){uid=u.uid;$("connection").textContent="Подключено к интернету"}})}catch(e){$("setupError").textContent="Ошибка Firebase: "+e.message}}
+async function createRoom(){if(!uid)return;playerName=$("name").value.trim()||"Игрок";let id=code();while((await get(ref(db,"rooms/"+id))).exists())id=code();roomId=id;isHost=true;const player={uid,name:playerName,score:0,joinedAt:Date.now(),host:true};const room={code:id,host:uid,status:"lobby",createdAt:serverTimestamp(),players:{[uid]:player},turnUid:uid,used:{},question:null,round:0,topic:null};await set(ref(db,"rooms/"+id),room);subscribeRoom();showRoom();toast("Комната создана!")}
+async function joinRoom(){if(!uid)return;playerName=$("name").value.trim()||"Игрок";const id=$("roomCode").value.trim().toUpperCase();if(!id){$("setupError").textContent="Введи код комнаты.";return}const snap=await get(ref(db,"rooms/"+id));if(!snap.exists()){$("setupError").textContent="Комната не найдена.";return}const r=snap.val();if(r.status!=="lobby"){$("setupError").textContent="Игра уже началась.";return}const players=Object.values(r.players||{});if(players.length>=12){$("setupError").textContent="В комнате уже 12 игроков.";return}if(players.some(p=>p.uid===uid)){roomId=id;isHost=r.host===uid;subscribeRoom();showRoom();return}const joined=await runTransaction(ref(db,`rooms/${id}`),v=>{if(!v||v.status!=="lobby")return;const ps=Object.values(v.players||{});if(ps.length>=12)return;if(ps.some(p=>p.uid===uid))return v;v.players=v.players||{};v.players[uid]={uid,name:playerName,score:0,joinedAt:Date.now(),host:false};return v});if(!joined.committed){$("setupError").textContent="Комната уже заполнена или игра началась.";return}roomId=id;isHost=false;subscribeRoom();showRoom()}
+function subscribeRoom(){if(unsubRoom)unsubRoom();unsubRoom=onValue(ref(db,"rooms/"+roomId),snap=>{if(!snap.exists()){toast("Комната закрыта.");resetUI();return}roomData=snap.val();renderRoom()})}
+function showRoom(){hide("setup");show("lobby");$("roomLabel").textContent=roomId;$("gameRoom").textContent=roomId}function renderRoom(){if(!roomData)return;const players=Object.values(roomData.players||{}).sort((a,b)=>a.joinedAt-b.joinedAt);$("lobbyStatus").textContent=`${players.length}/12 игроков · ${roomData.status==="lobby"?"ожидание начала":"игра идёт"}`;$("lobbyPlayers").innerHTML=players.map(p=>`<div class="player ${p.uid===uid?"me":""}">${esc(p.name)} ${p.host?"👑":""}<div class="pts">${p.score||0} очков</div></div>`).join("");$("startBtn").classList.toggle("hidden",roomData.status!=="lobby");if(roomData.status==="lobby"){show("lobby");hide("game");hide("questionPanel");hide("finalPanel")}else if(roomData.status==="playing"){hide("lobby");show("game");hide("finalPanel");renderBoard()}else if(roomData.status==="question"){hide("lobby");show("game");show("questionPanel");renderBoard();renderQuestion()}else if(roomData.status==="finished"){hide("lobby");hide("game");hide("questionPanel");show("finalPanel");renderFinal()}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderBoard(){if(!roomData)return;const players=Object.values(roomData.players||{});$("turnLabel").textContent="Темы идут по порядку — выбирать вручную не нужно";$("myScore").textContent=(roomData.players?.[uid]?.score)||0;$("gameNotice").textContent=roomData.status==="question"?(roomData.question?.buzzUid?`Отвечает: ${roomData.players?.[roomData.question.buzzUid]?.name||"игрок"}`:"Нажми «Я отвечаю!» первым."):"Следующий вопрос откроется автоматически.";const board=$("board");board.innerHTML="";const currentRoundIndex=rounds.findIndex(r=>r.topics.some((t,ti)=>t[1].some((q,qi)=>!roomData.used?.[`${rounds.indexOf(r)}-${ti}-${qi}`])));const visibleRoundIndex=currentRoundIndex<0?rounds.length-1:currentRoundIndex;rounds.forEach((r,ri)=>{if(ri!==visibleRoundIndex)return;const div=document.createElement("div");div.className="round";div.style.setProperty("--accent",["#d6ad52","#b98a3d","#e9cf83"][ri%3]);div.innerHTML=`<h3>${r.title}</h3>`;r.topics.forEach((t,ti)=>{const row=document.createElement("div");row.style.display="grid";row.style.gridTemplateColumns=`minmax(120px, 1.5fr) repeat(${t[1].length}, minmax(45px, 1fr))`;row.style.gap="6px";row.style.marginBottom="8px";row.style.alignItems="stretch";const sub=document.createElement("div");sub.style.display="flex";sub.style.alignItems="center";sub.style.justifyContent="center";sub.style.textAlign="center";sub.style.padding="8px";sub.style.overflowWrap="anywhere";sub.innerHTML=`<b>${esc(t[0])}</b>`;row.appendChild(sub);t[1].forEach((q,qi)=>{const key=`${ri}-${ti}-${qi}`;const btn=document.createElement("button");btn.className="topic"+(roomData.used?.[key]?" used":"");btn.disabled=true;btn.innerHTML=`<b>${(qi+1)*100}${specialCells.has(key)?" ✨":""}</b>`;row.appendChild(btn)});div.appendChild(row)});board.appendChild(div)});$("startBtn").classList.add("hidden");}
+async function startGame(){if(!roomData||roomData.status!=="lobby")return;const res=await runTransaction(ref(db,"rooms/"+roomId),r=>{if(!r||r.status!=="lobby")return;r.status="playing";r.round=0;r.used={};r.question=null;return r});if(res.committed){toast("Игра начинается! Вопросы идут по порядку.");await openNextQuestion()}}
+async function selectQuestion(){/* Ручной выбор отключён: вопросы открываются по порядку. */}
+async function openNextQuestion(){if(!roomId)return;const snap=await get(ref(db,"rooms/"+roomId));if(!snap.exists())return;const r=snap.val();if(r.status!=="playing")return;let pick=null;for(let ri=0;ri<rounds.length&&!pick;ri++)for(let ti=0;ti<rounds[ri].topics.length&&!pick;ti++)for(let qi=0;qi<rounds[ri].topics[ti][1].length;qi++){const key=`${ri}-${ti}-${qi}`;if(!r.used?.[key]){pick={ri,ti,qi,key};break}}if(!pick){await update(ref(db,"rooms/"+roomId),{status:"finished",question:null});return}const {ri,ti,qi,key}=pick,raw=rounds[ri].topics[ti][1][qi],special=specialCells.has(key)?(Math.random()<.5?"kitty":"secret"):"normal";constq={key,ri,ti,qi,topic:rounds[ri].topics[ti][0],text:raw[0],answer:raw[1],options:raw[2],points:(qi+1)*100,type:special,revealed:true,buzzUid:null,resolved:false,startedAt:Date.now(),deadline:Date.now()+30000};const result=await runTransaction(ref(db,"rooms/"+roomId),v=>{if(!v||v.status!=="playing"||v.used?.[key])return;v.status="question";v.question=q;v.used={...(v.used||{}),[key]:true};return v});if(result.committed)toast(`Тема: ${q.topic}`)}
+function normalizeAnswer(v){return String(v||"").toLocaleLowerCase("ru").replace(/ё/g,"е").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zа-я0-9]/gi,"")}
+function isAnswerCorrect(q,answer){const n=normalizeAnswer(answer);const aliases={"андресиниеста":["andresiniesta","андресиниеста"],"реалмадрид":["real madrid","реал"],"пари сен-жермен":["псж","paris saint germain","parissaintgermain"],"джорджвеа":["george weah","джорджвеа"],"зинединзидан":["zinedinezidane","зидан"]};const accepted=[q.answer,...(q.acceptedAnswers||[])].map(normalizeAnswer);for(const [canonical,alts] of Object.entries(aliases)){if(accepted.includes(normalizeAnswer(canonical)))accepted.push(...alts.map(normalizeAnswer))}return accepted.includes(n)}function renderQuestion(){const q=roomData.question;if(!q)return;currentQuestion=q;$("qRound").textContent=rounds[q.ri].title;$("qTopic").textContent=q.topic;$("qValue").textContent=q.points+" очк.";$("qSpecial").textContent=q.type==="kitty"?"🐈 Кот в мешке":q.type==="secret"?"🔮 Секрет":"Обычный вопрос";$("qText").textContent=q.text;$("kittyBox").classList.add("hidden");$("secretBox").classList.add("hidden");$("answerBox").classList.remove("hidden");const answers=$("answerButtons");answers.innerHTML="";q.options.forEach((opt,i)=>{const btn=document.createElement("button");btn.className="answer";btn.textContent=String.fromCharCode(65+i)+". "+opt;btn.disabled=!!q.resolved||!q.buzzUid||q.buzzUid!==uid||!!q.submittedAnswer;btn.onclick=()=>submitChoice(opt);answers.appendChild(btn)});const buzzed=q.buzzUid?roomData.players?.[q.buzzUid]?.name:null;$("buzzNotice").textContent=q.resolved?`Правильный ответ: ${q.answer}. ${q.lastCorrect?"Верно!":"Ответ не засчитан."}`:q.submittedAnswer?`${buzzed} ответил: ${q.submittedAnswer}. Проверяем автоматически…`:buzzed?`${buzzed} первым нажал — выбери вариант!`:"Кто первый нажмёт «Я отвечаю!» — тот отвечает.";let buzzBtn=document.getElementById("buzzBtn");if(!buzzBtn){buzzBtn=document.createElement("button");buzzBtn.id="buzzBtn";buzzBtn.className="gold";buzzBtn.textContent="🙋 Я отвечаю!";$("answerBox").appendChild(buzzBtn)}buzzBtn.classList.toggle("hidden",!!q.buzzUid||!!q.resolved);buzzBtn.onclick=buzz;$("resolveBtn").classList.add("hidden");$("backBoard").classList.add("hidden");$("appealForm").classList.toggle("hidden",!q.resolved);const ap=q.appeal;$("appealSubmit").disabled=!q.resolved||!!ap;$("appealAgainst").disabled=!q.resolved||!!ap;$("appealStatus").textContent=!q.resolved?"Апелляция доступна после оценки ответа.":!ap?"Нажми «Я ПРАВ», если ответ должен быть засчитан, или «Я ПРОТИВ», если оценка верная.":ap.status==="pending"?`Голоса: за — ${ap.yes||0}, против — ${ap.no||0}.`:`Апелляция ${ap.status==="accepted"?"удовлетворена":"отклонена"}.`;if(q.submittedAnswer&&!q.resolved)autoScoreSubmitted(q);if(!q.resolved&&Date.now()>(q.deadline||0))expireQuestion(q)}
+async function expireQuestion(q){const result=await runTransaction(ref(db,`rooms/${roomId}/question`),v=>{if(!v||v.resolved||Date.now()<(v.deadline||0))return;v.resolved=true;v.lastCorrect=false;v.scoreDelta=0;v.timedOut=true;return v});if(result.committed)setTimeout(()=>nextTurn(),1500)}
+async function submitAppeal(){return voteAppeal(true)}
+async function voteAppeal(thinkRight){const q=roomData?.question;if(!q?.resolved||!uid)return;const path=ref(db,`rooms/${roomId}/question`);const res=await runTransaction(path,v=>{if(!v||!v.resolved)return;v.appeal=v.appeal||{status:"pending",yes:0,no:0,votes:{},createdAt:Date.now()};if(v.appeal.status!=="pending"||v.appeal.votes?.[uid]!==undefined)return;v.appeal.votes=v.appeal.votes||{};v.appeal.votes[uid]=thinkRight;v.appeal.yes=Object.values(v.appeal.votes).filter(Boolean).length;v.appeal.no=Object.values(v.appeal.votes).filter(x=>x===false).length;return v});if(res.committed){toast("Голос учтён. Ожидаем остальные голоса…");setTimeout(settleAppeal,5000)}else toast("Ты уже проголосовал или голосование закрыто")}
+async function settleAppeal(){const snap=await get(ref(db,`rooms/${roomId}/question`));if(!snap.exists())return;const q=snap.val(),a=q.appeal;if(!a||a.status!=="pending"||Date.now()<(a.createdAt||0)+4500)return;const yes=Number(a.yes||0),no=Number(a.no||0);if(yes===no)return;const accepted=yes>no,updates={};updates[`rooms/${roomId}/question/appeal/status`]=accepted?"accepted":"rejected";if(accepted!==!!q.lastCorrect&&q.buzzUid){const old=Number(q.scoreDelta||0),delta=accepted?q.points:-q.points,ps=await get(ref(db,`rooms/${roomId}/players/${q.buzzUid}`)),pl=ps.val();updates[`rooms/${roomId}/players/${q.buzzUid}/score`]=Number(pl?.score||0)+delta-old;updates[`rooms/${roomId}/question/scoreDelta`]=delta;updates[`rooms/${roomId}/question/lastCorrect`]=accepted}awaitupdate(ref(db),updates);toast("Решение по апелляции применено")}
+async function decideAppeal(){/* Голосование вместо ведущего. */}
+async function revealSpecial(){/* Вопросы раскрываются автоматически. */}
+async function buzz(){const q=roomData?.question;if(!q||!q.revealed||q.buzzUid||q.resolved)return;const res=await runTransaction(ref(db,`rooms/${roomId}/question`),v=>{if(!v||v.buzzUid||v.resolved)return;v.buzzUid=uid;v.buzzAt=Date.now();return v});if(res.committed)toast("Ты первый! Выбирай ответ.")}
+async function submitChoice(opt){const q=roomData?.question;if(!q||q.buzzUid!==uid||q.resolved)return;const res=await runTransaction(ref(db,`rooms/${roomId}/question`),v=>{if(!v||v.resolved||v.buzzUid!==uid||v.submittedAnswer)return;v.submittedAnswer=opt;v.submittedAt=Date.now();return v});if(res.committed)toast("Ответ отправлен на автоматическую проверку")}async function autoScoreSubmitted(q){if(!q?.submittedAnswer||q.resolved||q.scoring)return;const claim=await runTransaction(ref(db,`rooms/${roomId}/question`),v=>{if(!v||v.resolved||v.scoring||!v.submittedAnswer)return;v.scoring=true;return v});if(!claim.committed)return;const ok=isAnswerCorrect(q,q.submittedAnswer),delta=ok?q.points:-q.points,ps=await get(ref(db,`rooms/${roomId}/players/${q.buzzUid}`)),player=ps.val();if(!player)return;const updates={};updates[`rooms/${roomId}/players/${q.buzzUid}/score`]=Number(player.score||0)+delta;updates[`rooms/${roomId}/question/resolved`]=true;updates[`rooms/${roomId}/question/lastCorrect`]=ok;updates[`rooms/${roomId}/question/scoreDelta`]=delta;updates[`rooms/${roomId}/question/scoring`]=false;await update(ref(db),updates);toast(ok?`Верно! +${delta} очков`:`Неверно: ${q.answer}`);setTimeout(nextTurn,8000)}
+async function resolveAnswer(){/* Оценка ответа автоматическая. */}
+async function nextTurn(){const q=roomData?.question;if(!q?.resolved)return;const snap=await get(ref(db,"rooms/"+roomId));if(!snap.exists())return;const r=snap.val(),total=rounds.reduce((sum,round)=>sum+round.topics.reduce((ss,t)=>ss+t[1].length,0),0);if(Object.keys(r.used||{}).length>=total){await update(ref(db,"rooms/"+roomId),{status:"finished",question:null});return}await update(ref(db,"rooms/"+roomId),{status:"playing",question:null});setTimeout(openNextQuestion,500)}
+setInterval(()=>{if(roomData?.status==="question"&&roomData.question&&!roomData.question.resolved&&Date.now()>(roomData.question.deadline||Infinity))expireQuestion(roomData.question)},1000);
+function renderFinal(){const ps=Object.values(roomData.players||{}).sort((a,b)=>(b.score||0)-(a.score||0));$("finalScores").innerHTML=ps.map((p,i)=>`<div class="player">${i===0?"🏆 ":""}${i+1}. ${esc(p.name)}<div class="pts">${p.score||0} очков</div></div>`).join("")}
+async function leaveRoom(){if(!roomId)return;if(isHost){if(confirm("Закрыть комнату для всех?"))await remove(ref(db,"rooms/"+roomId))}else await remove(ref(db,`rooms/${roomId}/players/${uid}`));resetUI()}
+function resetUI(){if(unsubRoom)unsubRoom();unsubRoom=null;roomId=null;roomData=null;isHost=false;show("setup");hide("lobby");hide("game");hide("questionPanel");hide("finalPanel")}
+$("createBtn").onclick=createRoom;$("joinBtn").onclick=joinRoom;$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(roomId);toast("Код скопирован: "+roomId)}catch{toast("Код комнаты: "+roomId)}};$("startBtn").onclick=startGame;$("leaveBtn").onclick=leaveRoom;$("revealBtn").onclick=revealSpecial;$("kittyBtn").onclick=revealSpecial;$("resolveBtn").onclick=resolveAnswer;$("appealSubmit").onclick=submitAppeal;$("appealAgainst").onclick=()=>voteAppeal(false);$("appealAccept").onclick=()=>decideAppeal(true);$("appealReject").onclick=()=>decideAppeal(false);$("backBoard").onclick=nextTurn;$("newRoomBtn").onclick=()=>{resetUI();$("name").value=playerName};$("roomCode").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase());init();
 </script>
-</body>
-</html>
+</body></html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
