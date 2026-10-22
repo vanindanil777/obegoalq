@@ -181,7 +181,98 @@ function configReady(){return !firebaseConfig.apiKey.startsWith("PASTE_")&&!fire
 async function init(){if(!configReady()){ $("connection").textContent="Нужна настройка Firebase";$("setupError").textContent="Сначала настрой Firebase по инструкции README.md и замени firebaseConfig в index.html."; $("createBtn").disabled=true;$("joinBtn").disabled=true;return}
 try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getDatabase(app);await signInAnonymously(auth);onAuthStateChanged(auth,u=>{if(u){uid=u.uid;$("connection").textContent="Подключено к интернету"}})}catch(e){$("setupError").textContent="Ошибка Firebase: "+e.message}}
 async function createRoom(){if(!uid)return;playerName=$("name").value.trim()||"Игрок";let id=code();while((await get(ref(db,"rooms/"+id))).exists())id=code();roomId=id;isHost=true;const player={uid,name:playerName,score:0,joinedAt:Date.now(),host:true};const room={code:id,host:uid,status:"lobby",createdAt:serverTimestamp(),players:{[uid]:player},turnUid:uid,used:{},question:null,round:0,topic:null};await set(ref(db,"rooms/"+id),room);subscribeRoom();showRoom();toast("Комната создана!")}
-async function joinRoom(){if(!uid)return;playerName=$("name").value.trim()||"Игрок";const id=$("roomCode").value.trim().toUpperCase();if(!id){$("setupError").textContent="Введи код комнаты.";return}const snap=await get(ref(db,"rooms/"+id));if(!snap.exists()){$("setupError").textContent="Комната не найдена.";return}const r=snap.val();if(r.status!=="lobby"){$("setupError").textContent="Игра уже началась.";return}const players=Object.values(r.players||{});if(players.length>=12){$("setupError").textContent="В комнате уже 12 игроков.";return}if(players.some(p=>p.uid===uid)){roomId=id;isHost=r.host===uid;subscribeRoom();showRoom();return}const joined=await runTransaction(ref(db,`rooms/${id}`),v=>{if(!v||v.status!=="lobby")return;const ps=Object.values(v.players||{});if(ps.length>=12)return;if(ps.some(p=>p.uid===uid))return v;v.players=v.players||{};v.players[uid]={uid,name:playerName,score:0,joinedAt:Date.now(),host:false};return v});if(!joined.committed){$("setupError").textContent="Комната уже заполнена или игра началась.";return}roomId=id;isHost=false;subscribeRoom();showRoom()}
+async function joinRoom() {
+  if (!uid) {
+    $("setupError").textContent = "Подключение к Firebase ещё не готово. Обнови страницу.";
+    return;
+  }
+
+  playerName = $("name").value.trim() || "Игрок";
+  const id = $("roomCode").value.trim().toUpperCase();
+
+  if (!id) {
+    $("setupError").textContent = "Введи код комнаты.";
+    return;
+  }
+
+  try {
+    const roomRef = ref(db, "rooms/" + id);
+    const snap = await get(roomRef);
+
+    if (!snap.exists()) {
+      $("setupError").textContent = "Комната не найдена.";
+      return;
+    }
+
+    const r = snap.val();
+
+    if (r.status !== "lobby") {
+      $("setupError").textContent = "Игра уже началась.";
+      return;
+    }
+
+    const players = Object.values(r.players || {});
+
+    if (players.some(p => p && p.uid === uid)) {
+      roomId = id;
+      isHost = r.host === uid;
+      subscribeRoom();
+      showRoom();
+      return;
+    }
+
+    if (players.length >= 12) {
+      $("setupError").textContent = "В комнате уже 12 игроков.";
+      return;
+    }
+
+    const result = await runTransaction(roomRef, room => {
+      if (!room || room.status !== "lobby") return;
+
+      room.players = room.players || {};
+
+      if (room.players[uid]) return room;
+
+      if (Object.keys(room.players).length >= 12) return;
+
+      room.players[uid] = {
+        uid: uid,
+        name: playerName,
+        score: 0,
+        joinedAt: Date.now(),
+        host: false
+      };
+
+      return room;
+    });
+
+    if (!result.committed) {
+      const latest = await get(roomRef);
+
+      if (!latest.exists()) {
+        $("setupError").textContent = "Комната была удалена.";
+      } else if (latest.val().status !== "lobby") {
+        $("setupError").textContent = "Игра уже началась.";
+      } else if (Object.keys(latest.val().players || {}).length >= 12) {
+        $("setupError").textContent = "В комнате уже 12 игроков.";
+      } else {
+        $("setupError").textContent =
+          "Firebase не разрешил подключение. Проверь правила базы данных.";
+      }
+      return;
+    }
+
+    roomId = id;
+    isHost = false;
+    subscribeRoom();
+    showRoom();
+
+  } catch (error) {
+    console.error("Ошибка подключения к комнате:", error);
+    $("setupError").textContent =
+      "Ошибка Firebase: " + (error.message || error.code || "неизвестная ошибка");
+  }
+}
 function subscribeRoom(){if(unsubRoom)unsubRoom();unsubRoom=onValue(ref(db,"rooms/"+roomId),snap=>{if(!snap.exists()){toast("Комната закрыта.");resetUI();return}roomData=snap.val();renderRoom()})}
 function showRoom(){hide("setup");show("lobby");$("roomLabel").textContent=roomId;$("gameRoom").textContent=roomId}function renderRoom(){if(!roomData)return;const players=Object.values(roomData.players||{}).sort((a,b)=>a.joinedAt-b.joinedAt);$("lobbyStatus").textContent=`${players.length}/12 игроков · ${roomData.status==="lobby"?"ожидание начала":"игра идёт"}`;$("lobbyPlayers").innerHTML=players.map(p=>`<div class="player ${p.uid===uid?"me":""}">${esc(p.name)} ${p.host?"👑":""}<div class="pts">${p.score||0} очков</div></div>`).join("");$("startBtn").classList.toggle("hidden",roomData.status!=="lobby");if(roomData.status==="lobby"){show("lobby");hide("game");hide("questionPanel");hide("finalPanel")}else if(roomData.status==="playing"){hide("lobby");show("game");hide("finalPanel");renderBoard()}else if(roomData.status==="question"){hide("lobby");show("game");show("questionPanel");renderBoard();renderQuestion()}else if(roomData.status==="finished"){hide("lobby");hide("game");hide("questionPanel");show("finalPanel");renderFinal()}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
